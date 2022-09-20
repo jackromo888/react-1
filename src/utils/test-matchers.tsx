@@ -1,11 +1,11 @@
 import '@testing-library/jest-dom'
-import 'jest-styled-components'
-import {styleSheetSerializer} from 'jest-styled-components/serializer'
+// import 'jest-styled-components'
+// import {styleSheetSerializer} from 'jest-styled-components/serializer'
 import React from 'react'
 import {ReactTestRendererJSON, ReactTestRendererNode} from 'react-test-renderer'
 import {getClasses, getComputedStyles, render} from './testing'
 
-expect.addSnapshotSerializer(styleSheetSerializer)
+// expect.addSnapshotSerializer(styleSheetSerializer)
 
 const stringify = (d: Record<string, unknown>) => JSON.stringify(d, null, '  ')
 

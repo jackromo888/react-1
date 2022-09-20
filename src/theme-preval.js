@@ -2,10 +2,11 @@
 // This file needs to be a JavaScript file using CommonJS to be compatible with preval
 // Cache bust: 2022-07-25 12:00:00 GMT (This file is cached by our deployment tooling, update this timestamp to rebuild this file)
 
-const {default: primitives} = require('@primer/primitives')
-const {partitionColors, fontStack, omitScale} = require('./utils/theme')
+import primitives from '@primer/primitives'
+import {partitionColors, fontStack, omitScale} from './utils/theme.js'
 
-const {lineHeight: lineHeights} = primitives.typography.normal
+console.log('PRIM', primitives)
+const {lineHeight: lineHeights} = primitives.default.typography.normal
 
 const animation = {
   easeOutCubic: 'cubic-bezier(0.33, 1, 0.68, 1)'
@@ -52,7 +53,7 @@ const space = ['0', '4px', '8px', '16px', '24px', '32px', '40px', '48px', '64px'
 /**
  * @type Record<keyof typeof primitives.colors, Record<'colors' | 'shadows', Partial<typeof primitives.colors.light>>
  */
-const colorSchemes = Object.entries(primitives.colors).reduce((acc, [name, variables]) => {
+const colorSchemes = Object.entries(primitives.default.colors).reduce((acc, [name, variables]) => {
   const {colors, shadows} = partitionColors(variables)
   acc[name] = {
     colors: omitScale(colors),
@@ -61,7 +62,7 @@ const colorSchemes = Object.entries(primitives.colors).reduce((acc, [name, varia
   return acc
 }, {})
 
-const theme = {
+export default {
   animation,
   borderWidths,
   breakpoints,
@@ -74,5 +75,3 @@ const theme = {
   space,
   colorSchemes
 }
-
-module.exports = theme

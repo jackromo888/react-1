@@ -1,5 +1,6 @@
 /* eslint-disable github/unescaped-html-literal */
-module.exports = {
+export default {
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
   testEnvironment: 'jsdom',
   cacheDirectory: '.test',
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/stories/**', '!**/*.stories.{js,jsx,ts,tsx}'],
@@ -8,9 +9,11 @@ module.exports = {
     '<rootDir>/src/utils/test-deprecations.tsx',
     '<rootDir>/src/utils/test-helpers.tsx'
   ],
-  testMatch: ['<rootDir>/(src|codemods)/**/*.test.[jt]s?(x)', '!**/*.types.test.[jt]s?(x)'],
-  transformIgnorePatterns: [
-    'node_modules/(?!@github/combobox-nav|@koddsson/textarea-caret|@github/markdown-toolbar-element)'
-  ],
+  testMatch: ['<rootDir>/(src|codemods)/**/Select.test.[jt]s?(x)'],
+  // testMatch: ['<rootDir>/(src|codemods)/**/*.test.[jt]s?(x)', '!**/*.types.test.[jt]s?(x)'],
+  transform: {
+    '^.+\\.(t|j)sx?$': ['@swc/jest']
+  },
+  transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(t|j)sx?$'],
   watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname']
 }

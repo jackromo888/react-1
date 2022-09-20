@@ -80,7 +80,7 @@ const testTokenComponent = (Component: React.ComponentType<React.PropsWithChildr
   })
 }
 
-describe('Token components', () => {
+describe.only('Token components', () => {
   describe('Token', () => {
     testTokenComponent(Token)
 

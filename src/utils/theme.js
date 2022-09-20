@@ -1,11 +1,11 @@
 // Utility functions used in theme-preval.js
 // This file needs to be a JavaScript file using CommonJS to be compatible with preval
 
-const isEmpty = require('lodash.isempty')
-const isObject = require('lodash.isobject')
-const chroma = require('chroma-js')
+import isEmpty from 'lodash.isempty'
+import isObject from 'lodash.isobject'
+import chroma from 'chroma-js'
 
-function fontStack(fonts) {
+export function fontStack(fonts) {
   return fonts.map(font => (font.includes(' ') ? `"${font}"` : font)).join(', ')
 }
 
@@ -13,15 +13,15 @@ function fontStack(fonts) {
 // Eventually, we will push these structural changes upstream to primer/primitives so this data manipulation
 // will not be needed.
 
-function isShadowValue(value) {
+export function isShadowValue(value) {
   return typeof value === 'string' && /(inset\s|)([0-9.]+(\w*)\s){1,4}(rgb[a]?\(.*\)|\w+)/.test(value)
 }
 
-function isColorValue(value) {
+export function isColorValue(value) {
   return chroma.valid(value)
 }
 
-function filterObject(obj, predicate) {
+export function filterObject(obj, predicate) {
   if (Array.isArray(obj)) {
     return obj.filter(predicate)
   }
@@ -42,23 +42,14 @@ function filterObject(obj, predicate) {
   }, {})
 }
 
-function partitionColors(colors) {
+export function partitionColors(colors) {
   return {
     colors: filterObject(colors, value => isColorValue(value)),
     shadows: filterObject(colors, value => isShadowValue(value))
   }
 }
 
-function omitScale(obj) {
+export function omitScale(obj) {
   const {scale, ...rest} = obj
   return rest
-}
-
-module.exports = {
-  fontStack,
-  isShadowValue,
-  isColorValue,
-  filterObject,
-  partitionColors,
-  omitScale
 }
