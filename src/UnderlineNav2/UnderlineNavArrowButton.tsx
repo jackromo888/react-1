@@ -22,11 +22,10 @@ const ArrowButton = ({
   const {theme} = useContext(UnderlineNavContext)
   const direction = type === 'left' ? -1 : 1
   const ARROW_BTN_WIDTH = 44 // Min touch target size is 44px
-  const [show, setShow] = React.useState(false)
+  const show = scrollValue > 0
 
   // re-trigger focus on the button with aria-disabled=true when it becomes hidden to communicate to screen readers that the button is no longer available
   React.useEffect(() => {
-    setShow(scrollValue > 0)
     const currentBtn = type === 'left' ? leftBtnRef.current : rightBtnRef.current
     if (currentBtn?.getAttribute('aria-disabled') === 'true') {
       currentBtn.focus()
@@ -34,7 +33,7 @@ const ArrowButton = ({
       // eslint-disable-next-line github/no-blur
       currentBtn?.blur()
     }
-  }, [scrollValue, type])
+  }, [show, type])
 
   let translateX = 0
   let display = 'flex'
