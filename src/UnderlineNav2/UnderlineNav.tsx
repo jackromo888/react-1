@@ -364,7 +364,6 @@ export const UnderlineNav = forwardRef(
             <ArrowButton
               scrollValue={scrollValues.scrollLeft}
               type="left"
-              show={scrollValues.scrollLeft > 0}
               onScrollWithButton={onScrollWithButton}
               aria-label={ariaLabel}
             />
@@ -417,7 +416,6 @@ export const UnderlineNav = forwardRef(
             <ArrowButton
               scrollValue={scrollValues.scrollRight}
               type="right"
-              show={scrollValues.scrollRight > 0}
               onScrollWithButton={onScrollWithButton}
               aria-label={ariaLabel}
             />
