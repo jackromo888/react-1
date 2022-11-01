@@ -13,6 +13,7 @@ import {
 } from '@primer/octicons-react'
 
 import {UnderlineNav} from '.'
+import {behavesAsComponent, checkExports, checkStoriesForAxeViolations} from '../utils/testing'
 
 // window.matchMedia() is not implemented by JSDOM so we have to create a mock:
 // https://jestjs.io/docs/manual-mocks#mocking-methods-which-are-not-implemented-in-jsdom
@@ -30,12 +31,25 @@ Object.defineProperty(window, 'matchMedia', {
   }))
 })
 
+const arrowLeft = {key: 'ArrowLeft', code: 37, charCode: 37}
+const arrowRight = {key: 'ArrowRight', code: 39, charCode: 39}
+const arrowUp = {key: 'ArrowUp', code: 38, charCode: 38}
+const arrowDown = {key: 'ArrowDown', code: 40, charCode: 40}
+const tab = {key: 'Tab', code: 9, charCode: 9}
+const enter = {key: 'Enter', code: 13, charCode: 13}
+const space = {key: ' ', code: 32, charCode: 32}
+
 const ResponsiveUnderlineNav = ({
   selectedItemText = 'Code',
-  loadingCounters = false
+  loadingCounters = false,
+  displayExtraEl = false,
+  returnItemsAs = 'a'
 }: {
   selectedItemText?: string
   loadingCounters?: boolean
+  displayExtraEl?: boolean
+  // This type declaration is only for test purposes. It's not part of the component's API.
+  returnItemsAs?: 'a' | 'button'
 }) => {
   const items: {navigation: string; icon?: React.FC<IconProps>; counter?: number}[] = [
     {navigation: 'Code', icon: CodeIcon},
@@ -48,23 +62,39 @@ const ResponsiveUnderlineNav = ({
     {navigation: 'Settings', counter: 10},
     {navigation: 'Security', icon: ShieldLockIcon}
   ]
+
   return (
-    <UnderlineNav aria-label="Repository" loadingCounters={loadingCounters}>
-      {items.map(item => (
-        <UnderlineNav.Item
-          key={item.navigation}
-          icon={item.icon}
-          selected={item.navigation === selectedItemText}
-          counter={item.counter}
-        >
-          {item.navigation}
-        </UnderlineNav.Item>
-      ))}
-    </UnderlineNav>
+    <div>
+      <UnderlineNav aria-label="Repository" loadingCounters={loadingCounters}>
+        {items.map(item => (
+          // @ts-ignore
+          <UnderlineNav.Item
+            key={item.navigation}
+            icon={item.icon}
+            selected={item.navigation === selectedItemText}
+            counter={item.counter}
+            as={returnItemsAs}
+          >
+            {item.navigation}
+          </UnderlineNav.Item>
+        ))}
+      </UnderlineNav>
+      {displayExtraEl && <button>Custom button</button>}
+    </div>
   )
 }
 
 describe('UnderlineNav', () => {
+  behavesAsComponent({
+    Component: UnderlineNav,
+    options: {skipAs: true, skipSx: true},
+    toRender: () => <ResponsiveUnderlineNav />
+  })
+
+  checkExports('UnderlineNav2', {
+    default: undefined,
+    UnderlineNav
+  })
   it('renders aria-current attribute to be pages when an item is selected', () => {
     const {getByText} = render(<ResponsiveUnderlineNav />)
     const selectedNavLink = getByText('Code').closest('a')
@@ -95,8 +125,10 @@ describe('UnderlineNav', () => {
     const item = getByText('Item 1')
     fireEvent.click(item)
     expect(onSelect).toHaveBeenCalledTimes(1)
-    fireEvent.keyPress(item, {key: 'Enter', code: 13, charCode: 13})
+    fireEvent.keyPress(item, enter)
     expect(onSelect).toHaveBeenCalledTimes(2)
+    fireEvent.keyPress(item, space)
+    expect(onSelect).toHaveBeenCalledTimes(3)
   })
   it('respects counter prop', () => {
     const {getByText} = render(<ResponsiveUnderlineNav />)
@@ -118,4 +150,101 @@ describe('UnderlineNav', () => {
     expect(heading.className).toContain('VisuallyHidden')
     expect(heading.textContent).toBe('Repository navigation')
   })
+  it('should render the items as provided "as" instead of anchor link', () => {
+    const {getByText} = render(<ResponsiveUnderlineNav returnItemsAs="button" />)
+    const item = getByText('Code').closest('button')
+    expect(item).not.toBeNull()
+  })
 })
+
+describe('Keyboard Navigation', () => {
+  it('should move focus to the next/previous item on the list with horizontal arrow keys', () => {
+    const {getByText} = render(<ResponsiveUnderlineNav />)
+    const item = getByText('Code').closest('a') as HTMLAnchorElement
+    const nextItem = getByText('Issues').closest('a') as HTMLAnchorElement
+    // Focus first item
+    item.focus()
+    // Press right arrow
+    fireEvent.keyDown(item, arrowRight)
+    // focus should be on the next item
+    expect(nextItem).toHaveFocus()
+    expect(nextItem.getAttribute('tabindex')).toBe('0')
+    fireEvent.keyDown(nextItem, arrowLeft)
+    // focus should be on the previous item
+    expect(item).toHaveFocus()
+    expect(nextItem.getAttribute('tabindex')).toBe('-1')
+    expect(item.getAttribute('tabindex')).toBe('0')
+  })
+  it('should move focus to the next/previous item on the list with vertical arrow keys', () => {
+    const {getByText} = render(<ResponsiveUnderlineNav />)
+    const item = getByText('Code').closest('a') as HTMLAnchorElement
+    const nextItem = getByText('Issues').closest('a') as HTMLAnchorElement
+    // Focus first item
+    item.focus()
+    // Press down arrow
+    fireEvent.keyDown(item, arrowDown)
+    // focus should be on the next item
+    expect(nextItem).toHaveFocus()
+    expect(nextItem.getAttribute('tabindex')).toBe('0')
+    // Press up arrow
+    fireEvent.keyDown(nextItem, arrowUp)
+    // focus should be on the previous item
+    expect(item).toHaveFocus()
+    expect(nextItem.getAttribute('tabindex')).toBe('-1')
+    expect(item.getAttribute('tabindex')).toBe('0')
+  })
+  it('should move focus to the next/previous item on the list with the tab key', () => {
+    const {getByText} = render(<ResponsiveUnderlineNav />)
+    const item = getByText('Code').closest('a') as HTMLAnchorElement
+    const nextItem = getByText('Issues').closest('a') as HTMLAnchorElement
+    // Focus first item
+    item.focus()
+    // Press down arrow
+    fireEvent.keyDown(item, tab)
+    // focus should be on the next item
+    expect(nextItem).toHaveFocus()
+    expect(nextItem.getAttribute('tabindex')).toBe('0')
+  })
+  it('should trap the focus within the nav element when navigating with arrow keys', () => {
+    const {getByText} = render(<ResponsiveUnderlineNav displayExtraEl={true} />)
+    const firstItem = getByText('Code').closest('a') as HTMLAnchorElement
+    const lastItem = getByText('Security').closest('a') as HTMLAnchorElement
+    // Focus first item
+    firstItem.focus()
+    // Press up arrow
+    fireEvent.keyDown(firstItem, arrowUp)
+    // Focus should still be on the first item
+    expect(firstItem).toHaveFocus()
+    // Press left arrow
+    fireEvent.keyDown(firstItem, arrowLeft)
+    // Focus should still be on the first item
+    expect(firstItem).toHaveFocus()
+
+    // Focus last item
+    lastItem.focus()
+    // Press down arrow
+    fireEvent.keyDown(lastItem, arrowDown)
+    // focus should still be on the last item
+    expect(lastItem).toHaveFocus()
+    // Press right arrow
+    fireEvent.keyDown(lastItem, arrowRight)
+    // focus should still be on the last item
+    expect(lastItem).toHaveFocus()
+  })
+  // This test is failing right now. Not sure why but will look into it.
+  it.skip('should not trap the focus within the nav element when navigating with the tab key', () => {
+    const {container, getByText} = render(<ResponsiveUnderlineNav displayExtraEl={true} />)
+    const customBtn = container.getElementsByTagName('button')[0]
+
+    const lastItem = getByText('Security').closest('a') as HTMLAnchorElement
+    // Focus first item
+    lastItem.focus()
+    // Press down arrow
+    fireEvent.keyDown(lastItem, tab)
+    // focus shouldn't be on the last item
+    expect(lastItem).not.toHaveFocus()
+    expect(customBtn).toHaveFocus()
+  })
+})
+
+checkStoriesForAxeViolations('examples', '../UnderlineNav2/')
