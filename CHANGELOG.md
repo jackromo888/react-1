@@ -1,5 +1,19 @@
 # @primer/components
 
+## 35.14.1
+
+### Patch Changes
+
+- [#2483](https://github.com/primer/react/pull/2483) [`23647cfc`](https://github.com/primer/react/commit/23647cfce6132bcf16aa2a31c33c20be029124e0) Thanks [@joshblack](https://github.com/joshblack)! - Add unobserve mock for ResizeObserver in test helpers
+
+- [#2504](https://github.com/primer/react/pull/2504) [`ea4a3c2a`](https://github.com/primer/react/commit/ea4a3c2a11d8d9cdc972405495902ac8e7b61e54) Thanks [@joshblack](https://github.com/joshblack)! - TreeView: Add support for Backspace to move focus to parent item
+
+- [#2511](https://github.com/primer/react/pull/2511) [`0a94420e`](https://github.com/primer/react/commit/0a94420e96a1989a0183f36ec7b90954c4ff4c7b) Thanks [@joshblack](https://github.com/joshblack)! - Remove selected from <option> and add defaultValue for <select> when placeholder is provided
+
+- [#2521](https://github.com/primer/react/pull/2521) [`862f93c7`](https://github.com/primer/react/commit/862f93c7438b4c9be753e98a39af98c496d8629f) Thanks [@colebemis](https://github.com/colebemis)! - TreeView: Fix unexpected scrolling when focusing child items
+
+- [#2518](https://github.com/primer/react/pull/2518) [`60c36f58`](https://github.com/primer/react/commit/60c36f5872182047c8242718ae1fdeb5bf1669b8) Thanks [@colebemis](https://github.com/colebemis)! - TreeView: Remove loading indicator delay
+
 ## 35.14.0
 
 ### Minor Changes
